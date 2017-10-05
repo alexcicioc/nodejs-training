@@ -1,0 +1,51 @@
+'use strict';
+
+let User = require('../models/user');
+const config = require('../../config');
+const express = require('express');
+const router = express.Router();
+const response = require('../helpers/response');
+const auth = require('../helpers/authentication');
+
+// Handle unexpected exceptions
+router.use(function (err, req, res, next) {
+    response.exceptionResponse(res, err);
+});
+module.exports = router;
+
+// /users POST - creates a new user
+router.post('/', (req, res) => {
+    const user = req.body;
+    User.addUser(user, (err, user) => {
+        if (err) {
+            throw err;
+        } else {
+            response.success(res, user);
+        }
+    });
+});
+
+router.get('/search/:_text', (req, res) => {
+    User.searchUser(req.params._text, (err, results) => {
+        if (err) {
+            throw  err;
+        }
+        response.success(res, {users: parseUserSearchResults(results)});
+    })
+});
+
+router.post('/authenticate', auth.authAndGenerateToken);
+
+
+function parseUserSearchResults(results) {
+
+    let cleanResults = [];
+
+    for (let index in results) {
+        cleanResults[index] = {};
+        cleanResults[index].userId = results[index].id;
+        cleanResults[index].info = results[index].info;
+    }
+
+    return cleanResults;
+}

@@ -1,0 +1,68 @@
+<html>
+<body>
+<form
+        id='uploadForm'
+        action='{{baseUrl}}images/uploadImage'
+        method='post'
+        encType="multipart/form-data">
+    <table style="width: 500px; margin:auto;">
+        <tr>
+            <th colspan="2">
+                Image Upload Form
+            </th>
+        </tr>
+        <tr>
+            <td>
+                AuthToken
+            </td>
+            <td>
+                <input type="text" name="token"/>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Title
+            </td>
+            <td>
+                <input type="text" name="title"/>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Created by:
+            </td>
+            <td>
+                <select name="user">
+                    {% for user in allUsers %}
+                    <option value="{{ user }}">{{ user }}</option>
+                    {% endfor %}
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Keywords
+            </td>
+            <td>
+                <input type="text" name="keywords"/>
+                <br/>
+                <em>Separated by comma</em>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                File Path:
+            </td>
+            <td>
+                <input type="file" name="imageFile"/>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <input type='submit' value='Upload!'/>
+            </td>
+        </tr>
+    </table>
+</form>
+</body>
+</html>
