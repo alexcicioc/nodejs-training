@@ -127,7 +127,7 @@ paths:
                   $ref: "#/definitions/ErrorResponse"
   # Users controller                
   /users:
-      x-swagger-router-controller: users2
+      x-swagger-router-controller: users
       get:
             security:
             - UserAuthentication: []
@@ -241,7 +241,7 @@ paths:
                   $ref: "#/definitions/ErrorResponse"
                   
   /users/authenticate:
-      x-swagger-router-controller: users2
+      x-swagger-router-controller: users
       post:
             description: login an generate a token
             operationId: authenticate
@@ -280,12 +280,14 @@ paths:
                   $ref: "#/definitions/ErrorResponse"
                   
   /users/friends:
-      x-swagger-router-controller: users2
+      x-swagger-router-controller: friends
       delete:
             description: search for users
             operationId: deleteFriend
             security:
             - UserAuthentication: []
+            tags:
+            - users
             parameters:
             - in: body
               name: body
@@ -314,6 +316,8 @@ paths:
             operationId: addFriend
             security:
             - UserAuthentication: []
+            tags:
+            - users
             parameters:
             - in: body
               name: body
@@ -331,6 +335,10 @@ paths:
                   $ref: "#/definitions/GeneralResponse"
               "404":
                 description: Username not found
+                schema:
+                  $ref: "#/definitions/ErrorResponse"
+              "409":
+                description: You are already friends with the user
                 schema:
                   $ref: "#/definitions/ErrorResponse"
               default:
@@ -437,7 +445,7 @@ paths:
                   $ref: "#/definitions/ErrorResponse"
   # Images Controller                
   /users/images:
-      x-swagger-router-controller: images2
+      x-swagger-router-controller: images
       post:
             operationId: uploadImage
             security:
@@ -486,7 +494,7 @@ paths:
     
   /users/{userId}/images:
       # our controller name
-      x-swagger-router-controller: images2
+      x-swagger-router-controller: images
       get:
             security:
             - UserAuthentication: []
@@ -520,7 +528,7 @@ paths:
                   $ref: "#/definitions/ErrorResponse"
                   
   /users/{userId}/profilePicture:
-      x-swagger-router-controller: images2
+      x-swagger-router-controller: images
       post:
             operationId: setProfilePicture
             security:

@@ -1,8 +1,9 @@
+const assert = require('assert');
 const config = require('../../config');
 const jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
 const response = require('./response'); // used to create, sign, and verify tokens
-User = require('../models/user');
-
+/** @class UserDomain */
+UserDomain = require('../domains/user');
 
 module.exports.adminAuth = (req, authOrSecDef, scopesOrApiKey, cb) => {
     checkToken(req, authOrSecDef, scopesOrApiKey, () => {
@@ -12,7 +13,6 @@ module.exports.adminAuth = (req, authOrSecDef, scopesOrApiKey, cb) => {
             throw Error('user is not admin');
         }
     });
-
 };
 
 function checkToken(req, authOrSecDef, scopesOrApiKey, cb) {
@@ -30,11 +30,11 @@ function checkToken(req, authOrSecDef, scopesOrApiKey, cb) {
                 // if everything is good, save to request for use in other routes
                 // req.decoded = decoded;
 
-                User.findById(decoded.id).then((user) => {
+                UserDomain.getById(decoded.id).then((user) => {
                     if (!user) {
                         throw new Error('Auth check failed');
                     }
-
+                    /** @class UserDomain */
                     req.user = user;
                     cb();
                 }).catch((err) => {
@@ -49,6 +49,7 @@ function checkToken(req, authOrSecDef, scopesOrApiKey, cb) {
 }
 
 function generateToken(user) {
+    assert(user instanceof UserDomain);
     return jwt.sign({
         username: user.username,
         password: user.password,
