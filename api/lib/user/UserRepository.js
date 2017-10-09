@@ -1,50 +1,9 @@
 'use strict';
+const UserEntity = require('./UserEntity');
 /** @class Model */
-const userDB = require('../models/user');
-const assert = require('assert');
+const userDB = require('../../models/user');
 
-class UserDomain {
-
-    constructor(userDbInstance) {
-        /** @var userDB */
-        this.userDbInstance = userDbInstance;
-    }
-
-    get id() {
-        return this.userDbInstance.id;
-    }
-
-    get username() {
-        return this.userDbInstance.username;
-    }
-
-    get password() {
-        return this.userDbInstance.password;
-    }
-
-    get info() {
-        return this.userDbInstance.info;
-    }
-
-    get createDate() {
-        return this.userDbInstance.create_date;
-    }
-
-    get friends() {
-        return this.userDbInstance.friends;
-    }
-
-    set info(infoObject) {
-        assert(infoObject instanceof Object);
-        for (let index in infoObject) {
-            this.userDbInstance.info[index] = infoObject[index];
-        }
-    }
-    set friends(friendsArray) {
-        assert(friendsArray instanceof Array);
-        this.userDbInstance.friends = friendsArray;
-    }
-
+class UserRepository {
     /**
      * @param username
      *
@@ -53,7 +12,7 @@ class UserDomain {
     static getByUsername(username) {
         return userDB.findOne({'username': username}).then((userInstance) => {
             if (userInstance) {
-                return new UserDomain(userInstance);
+                return new UserEntity(userInstance);
             }
 
             throw new Error('Failed to get user by username=' + username)
@@ -78,7 +37,7 @@ class UserDomain {
      */
     static getById(id) {
         return userDB.findById(id).then((user) => {
-            return new UserDomain(user);
+            return new UserEntity(user);
         })
     }
 
@@ -89,8 +48,7 @@ class UserDomain {
      */
     static create(userObject) {
 
-        return UserDomain.usernameExists(userObject.username).then((usernameTaken) => {
-            console.log(usernameTaken);
+        return this.usernameExists(userObject.username).then((usernameTaken) => {
             if (usernameTaken) {
                 throw new Error('Username already exists');
             }
@@ -98,7 +56,7 @@ class UserDomain {
             return userDB.create(userObject);
 
         }).then((user) => {
-            return new UserDomain(user);
+            return new UserEntity(user);
         });
     }
 
@@ -119,7 +77,7 @@ class UserDomain {
         }
 
         return query.limit(limit).skip(skip).then((results) => {
-            return results.map((item) => new UserDomain(item));
+            return results.map((item) => new UserEntity(item));
         });
     }
 
@@ -127,10 +85,11 @@ class UserDomain {
      * @param username
      * @param password
      *
-     * @returns UserDomain
+     * @returns Promise
      */
     static getUserIfPasswordMatches(username, password) {
-        return UserDomain.getByUsername(username).then((user) => {
+
+        return this.getByUsername(username).then((user) => {
                 if (!user) {
                     throw Error('Username does not exist');
                 }
@@ -139,18 +98,10 @@ class UserDomain {
                     throw Error('Invalid password');
                 }
 
-                return new UserDomain(user);
+                return user;
             }
         );
     }
-
-    save() {
-        this.userDbInstance.save();
-    }
-
-    remove() {
-        this.userDbInstance.remove();
-    }
 }
 
-module.exports = UserDomain;
+module.exports = UserRepository;

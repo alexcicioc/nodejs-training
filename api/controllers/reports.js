@@ -11,8 +11,6 @@
  It is a good idea to list the modules that your application depends on in the package.json in the project root
  */
 const response = require('../helpers/response');
-const authentication = require('../helpers/authentication');
-const yields = require('express-yields');
 
 /*
  Once you 'require' a module you can reference the things that it exports.  These are defined in module.exports.
@@ -32,42 +30,18 @@ module.exports = {
     getNumberOfUsersByAge: getNumberOfUsersByAge,
     test: test
 };
+
 let User = require('../models/user');
-a = 'global';
+let Report = require('../lib/user/Report');
 
 function test(req, res) {
-    // test2();
-    //
-    // console.log(a);
-
-    // let a = [1,2,3];
-    // console.log(this.a);
-    // test2.apply({a:'whatever'}, a);
-
-    let testClass = new TestClass();
-    testClass.setB('b din controller');
-    testClass.setA('a din controller');
-
-    console.log(testClass);
-
     res.status(200).send({ceva: 'ceva'});
 }
 
-
 function getNumberOfUsersByAge(req, res) {
 
-    User.numberOfUsersByAge().then((doc) => {
-        // Iterator example
-        let ages = doc[Symbol.iterator]();
-        let agesItem = ages.next();
-        let report = {ages: []};
-        do {
-            report.ages.push({age: agesItem.value._id, total: agesItem.value.total});
-            agesItem = ages.next();
-
-        } while (!agesItem.done);
-
-        response.success(res, report);
+    Report.getUsersByAge().then((results) => {
+        response.success(res, results);
     });
 }
 

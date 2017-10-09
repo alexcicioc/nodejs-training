@@ -33,19 +33,17 @@ module.exports = {
     updateUser: updateUser,
     authenticate: authenticate,
 };
-let User = require('../models/user');
-/** @class UserDomain */
-let UserDomain = require('../domains/user');
+const UserRepository = require('../lib/user/UserRepository');
 
 function createUser(req, res) {
 
     let body = req.body;
     body.password = authentication.encryptPassword(body.password);
 
-    UserDomain.create(body).then((UserDomain) => {
+    UserRepository.create(body).then((UserEntity) => {
         response.success(res, {
-            id: UserDomain.id,
-            createDate: UserDomain.createDate
+            id: UserEntity.id,
+            createDate: UserEntity.createDate
         }, httpCodes.CREATED);
     }).catch((err) => {
         response.badRequestResponse(res, err.message, httpCodes.CONFLICT);
@@ -59,7 +57,7 @@ function getUsers(req, res) {
 
     let skip = (pageNo - 1) * itemsOnPage;
 
-    UserDomain.getUsers(itemsOnPage, skip, searchText).then((users) => {
+    UserRepository.getUsers(itemsOnPage, skip, searchText).then((users) => {
         response.success(res, {users: users.map(mapUsers)});
     });
 
@@ -79,7 +77,7 @@ function updateUser(req, res) {
 function deleteUser(req, res) {
     let body = req.swagger.params.body.value;
 
-    User.getById(body.userId).then((user) => {
+    UserRepository.getById(body.userId).then((user) => {
         if (!user) {
             throw new Error('User with id ' + body.userId + ' not found');
         } else {
@@ -97,12 +95,13 @@ function authenticate(req, res) {
     let body = req.swagger.params.body.value;
     body.password = authentication.encryptPassword(body.password);
 
-    UserDomain.getUserIfPasswordMatches(body.username, body.password).then((user) => {
+    UserRepository.getUserIfPasswordMatches(body.username, body.password).then((user) => {
         response.success(res, {
             userId: user.id,
             authToken: authentication.generateToken(user)
         });
     }).catch((err) => {
+        console.log(err);
         response.unauthorized(res, err.message);
     });
 }

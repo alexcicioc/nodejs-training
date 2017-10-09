@@ -30,15 +30,15 @@ module.exports = {
     deleteFriend: deleteFriend,
 };
 
-let UserDomain = require('../domains/user');
-let FriendshipDomain = require('../domains/friendship');
+const UserRepository = require('../lib/user/UserRepository');
+const Friendship = require('../lib/user/Friendship');
 
 function addFriend(req, res) {
     let body = req.swagger.params.body.value;
 
-    UserDomain.getByUsername(body.username).then((friend) => {
+    UserRepository.getByUsername(body.username).then((friend) => {
 
-        let friendship = new FriendshipDomain(req.user, friend);
+        let friendship = new Friendship(req.user, friend);
 
         if (friendship.friendshipExists()) {
             response.badRequestResponse(res, 'You are already friends with ' + friend.username, httpCodes.CONFLICT)
@@ -56,9 +56,9 @@ function deleteFriend(req, res) {
 
     let body = req.swagger.params.body.value;
 
-    UserDomain.getByUsername(body.username).then((friend) => {
+    UserRepository.getByUsername(body.username).then((friend) => {
 
-        let friendship = new FriendshipDomain(req.user, friend);
+        let friendship = new Friendship(req.user, friend);
         friendship.deleteFriendship();
         response.genericSuccess(res, 'Friend deleted');
 

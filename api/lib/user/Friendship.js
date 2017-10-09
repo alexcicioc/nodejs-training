@@ -1,16 +1,17 @@
 'use strict';
 const assert = require('assert');
+const UserEntity = require('./UserEntity');
 
-class FriendshipDomain {
+class Friendship {
 
-    constructor(UserDomain, FriendUserDomain) {
+    constructor(firstUser, secondUser) {
 
-        assert(UserDomain instanceof UserDomain.constructor, 'bad instance for UserDomain');
-        assert(FriendUserDomain instanceof UserDomain.constructor, 'bad instance for FriendUserDomain');
-        /** @var UserDomain */
-        this.user = UserDomain;
-        /** @var UserDomain */
-        this.friend = FriendUserDomain;
+        assert(firstUser instanceof UserEntity, 'bad instance for firstUser');
+        assert(secondUser instanceof UserEntity, 'bad instance for secondUser');
+        /** @var UserEntity */
+        this.user = firstUser;
+        /** @var UserEntity */
+        this.friend = secondUser;
     }
 
     createFriendship() {
@@ -41,4 +42,4 @@ class FriendshipDomain {
     }
 }
 
-module.exports = FriendshipDomain;
+module.exports = Friendship;

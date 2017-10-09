@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const assert = require('assert');
 
 // Book Schema
 const userSchema = mongoose.Schema({
@@ -113,15 +112,6 @@ module.exports.getNumberOfFriendsForEachUser = () => {
                 averageNumberOfFriends: {$avg: {$size: "$friends"}}
             }
         }
-    ]);
-};
-
-module.exports.numberOfUsersByAge = () => {
-    return User.aggregate([
-        {$match: {"info.age": {$exists: true}}},
-        {$project: {"info.age": {$subtract: ["$info.age", {$mod: ["$info.age", 1]}]}}},
-        {$group: {_id: "$info.age", total: {$sum: 1}}},
-        {$sort: {"Total": -1}}
     ]);
 };
 

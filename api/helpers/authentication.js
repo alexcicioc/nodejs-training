@@ -1,16 +1,18 @@
+'use strict';
 const assert = require('assert');
 const config = require('../../config');
 const jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
-const response = require('./response'); // used to create, sign, and verify tokens
-/** @class UserDomain */
-UserDomain = require('../domains/user');
+/** @class UserEntity */
+let UserEntity = require('../lib/user/UserEntity');
+let UserRepository = require('../lib/user/UserRepository');
 
 module.exports.adminAuth = (req, authOrSecDef, scopesOrApiKey, cb) => {
     checkToken(req, authOrSecDef, scopesOrApiKey, () => {
         if (req.user.userType === 1) {
             cb();
         } else {
-            throw Error('user is not admin');
+            cb(Error('user is not admin'));
+            // throw Error('user is not admin');
         }
     });
 };
@@ -22,7 +24,7 @@ function checkToken(req, authOrSecDef, scopesOrApiKey, cb) {
     if (token) {
 
         // verifies secret and checks exp
-        jwt.verify(token, config.auth.secret, function (err, decoded) {
+        jwt.verify(token, config.auth.secret, (err, decoded) => {
             if (err) {
                 throw Error('Failed to validate the token');
                 // return response.unauthorized(res, 'Failed to validate the token');
@@ -30,11 +32,11 @@ function checkToken(req, authOrSecDef, scopesOrApiKey, cb) {
                 // if everything is good, save to request for use in other routes
                 // req.decoded = decoded;
 
-                UserDomain.getById(decoded.id).then((user) => {
+                UserRepository.getById(decoded.id).then((user) => {
                     if (!user) {
                         throw new Error('Auth check failed');
                     }
-                    /** @class UserDomain */
+                    /** @class UserEntity */
                     req.user = user;
                     cb();
                 }).catch((err) => {
@@ -49,7 +51,7 @@ function checkToken(req, authOrSecDef, scopesOrApiKey, cb) {
 }
 
 function generateToken(user) {
-    assert(user instanceof UserDomain);
+    assert(user instanceof UserEntity, 'user is not an instance of UserEntity');
     return jwt.sign({
         username: user.username,
         password: user.password,
